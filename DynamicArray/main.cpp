@@ -24,18 +24,18 @@ int main()
 		digits.Add(Digit(RandomInt(1,50)));
 
 		clock_t t2_element = clock();
-		double time_per_element = t2_element - t1_element;
+		double time_per_element = (t2_element - t1_element)/(double)CLOCKS_PER_SEC;
 
 		if (time_per_element > max_time_per_element)
 		{
 			max_time_per_element = time_per_element;
-			std::cout << "Time : " << max_time_per_element << " Index: " << i << std::endl;
+			std::cout << "Czas : " << max_time_per_element << " s. Index: " << i << std::endl;
 		}
 
 	}
 
 	clock_t t2 = clock();
-	std::cout << "Czas: " << t2 - t1 << std::endl;
+	std::cout << "Czas: " << (t2 - t1)/(double)CLOCKS_PER_SEC << " s."<<std::endl;
 	std::cout << digits.ToString();
 
 	digits.Clear();
