@@ -25,7 +25,7 @@ public:
 
         std::pair<string, T> entry(key, data);
 
-        int hashedIndex = Hash(key) % table.capacity();
+        int hashedIndex = Hash(key, table.capacity());
 
         if (!table[hashedIndex].empty())
         {
@@ -53,7 +53,7 @@ public:
 
     }
     std::pair<string, T>* Search(const string& key) {
-        int hashedIndex = Hash(key) % table.capacity();
+        int hashedIndex = Hash(key, table.capacity());
 
         if (!table[hashedIndex].empty()) {
             for ( auto& pair : table[hashedIndex]) {
@@ -69,7 +69,7 @@ public:
         if (size <= 0 ||temp == nullptr)
             return false;
         
-        int hashedIndex = Hash(key) % table.capacity();
+        int hashedIndex = Hash(key, table.capacity());
 
         table[hashedIndex].remove_if([&temp](const auto& pair) {
             return &pair == temp; });
@@ -78,8 +78,6 @@ public:
         temp = nullptr;
 
         return true;
-  
-
     }
     string toString() {
 
@@ -164,6 +162,7 @@ public:
     }
     void Clear() {
      
+        table.clear();
         size = 0;
         table.resize(4);
         table.shrink_to_fit();
@@ -173,47 +172,24 @@ public:
 
 
 private:
-    int Hash(const string& slowo) {
-        int output = int(slowo[0]);
+    int Hash(const string& slowo, int cap) {
+        unsigned int output = int(slowo[0]);
         for (int i = 1; i < slowo.length(); i++) {
-            output = output * 31 + int(slowo[i]);
-        
+            output = output * 31 + int(slowo[i]);        
         }
-        return abs(output);
+        return output % cap;
     }
     void Rehash() {     
         std::vector<std::forward_list<std::pair<string, T>>> temp(table.size() * 2);
 
         for (int i = 0; i < table.capacity(); i++)
-        {
-            if (!table[i].empty())
+        {   
+            for (const auto& pair : table[i])
             {
-                for (const auto& pair : table[i])
-                {
-                    std::pair<string, T> entry = pair;
-                    int newHashedIndex = Hash(entry.first) % temp.capacity();
-
-                    if (!temp[newHashedIndex].empty())
-                    {
-                        bool overwritten = false;
-                        for (auto& pair : temp[newHashedIndex])
-                        {
-                            if (pair.first == entry.first)
-                            {
-                                pair.second = entry.second;
-                                overwritten = true;
-                                break;
-                            }
-                        }
-                        if (!overwritten)                        
-                            temp[newHashedIndex].push_front(entry);                        
-                        
-                    }
-                    else 
-                        temp[newHashedIndex].push_front(entry);                    
-                    
-                }
-              
+                std::pair<string, T> entry = pair;
+                int newHashedIndex = Hash(entry.first, temp.capacity());
+                                  
+                temp[newHashedIndex].push_front(entry);
             }
         }
         table = temp;
